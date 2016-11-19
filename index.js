@@ -2,6 +2,7 @@ var request = require('request');
 // var prompt = require('prompt');
 var prompt = require('prompt-sync')();
 var moment = require('moment');
+var _ = require('underscore');
 
 request({
 	url: 'http://lauzhack.ael.li/events',
@@ -20,9 +21,38 @@ request({
     eventsResponse = JSON.parse(body);
     //this should be 1000
     console.log(eventsResponse.length);
-    getIntervals();
+    var button_events = _.where(eventsResponse, {type: 'button', major: '20', minor: '25'});
+    console.log(button_events);
+    var intervals = getIntervals();
 
+    check_if_took(button_events, intervals);
 });
+
+function check_if_took (data, intervals){
+    var time_now = Math.floor(Date.now() / 1000);
+    var counter = 0;
+    console.log('Inside the function');
+    for (var i = 0; (i < data.length) && (counter < intervals.length); i++){
+        if (time_now < intervals[counter].start){ //still not time
+        	return;
+        }
+        if (counter < intervals.length - 1){
+	        if (data[i].creationTimestamp > intervals[counter].end && data[i].creationTimestamp < intervals[counter+1].start){
+	        	console.log('You took it in wrong time');
+	        	counter++;
+        	}
+        }
+        if ((intervals[counter].start <= data[i].creationTimestamp) && (intervals[counter].end >= data[i].creationTimestamp)){
+            counter++;
+        } else{
+        	console.log('Took pill in appropriate time');
+        }
+    }
+    if (counter != intervals.length)
+        console.log('You forgot to take the pill.');
+    else
+	    console.log('You didn\'t forget any pills');
+}
 
 function getIntervals() {
 	var pillIntervals = [];
@@ -36,7 +66,7 @@ function getIntervals() {
 			end: getEndTime()
 		});
 	}
-	console.log(pillIntervals);
+	return pillIntervals;
 }
 
 function getStartTime() {
