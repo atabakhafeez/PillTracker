@@ -4,6 +4,8 @@ var prompt = require('prompt-sync')();
 var moment = require('moment');
 var _ = require('underscore');
 
+
+
 request({
     url: 'http://lauzhack.ael.li/events',
     method: 'GET',
@@ -25,8 +27,37 @@ request({
     console.log(button_events);
     var intervals = getIntervals();
 
-    check_if_took(button_events, intervals);
+    setInterval(function() {
+        request({
+            url: 'http://lauzhack.ael.li/events',
+            method: 'GET',
+            headers: {
+                'token': 'saEbYNtHbxZ6ThHE'
+            }
+        },  function(error, response, body){
+            if(error){
+                return console.log('Error:', error);
+            }
+            if(response.statusCode !== 200){
+                return console.log('Invalid Status Code Returned:', response.statusCode);
+            }
+            // console.log(body);
+            eventsResponse = JSON.parse(body);
+            //this should be 1000
+            console.log(eventsResponse.length);
+            var button_events = _.where(eventsResponse, {type: 'button', major: '20', minor: '25'});
+            console.log(button_events);
+
+            check_if_took(button_events, intervals);
+        });
+
+    }, 3000);
+
+    // check_if_took(button_events, intervals);
 });
+
+
+
 
 function check_if_took (data, intervals){
     var time_now = Math.floor(Date.now() / 1000);
