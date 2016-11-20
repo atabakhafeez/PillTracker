@@ -81,7 +81,7 @@ function getStartTime() {
 	var parts = startTime.split(":");
 	var hours = parseInt(parts[0]);
 	var minutes = parseInt(parts[1]);
-	var seconds = (hours + minutes * 60) * 60;
+	var seconds = (hours * 60 + minutes) * 60;
 	return moment().startOf('day').unix() + seconds;
 }
 
