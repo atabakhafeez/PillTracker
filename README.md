@@ -1,6 +1,6 @@
 # PillTracker
 
-Inspiration
+## Inspiration
 
 It is always a problem to remember to take pills on time, so we need a better way to track pill taking.
 
